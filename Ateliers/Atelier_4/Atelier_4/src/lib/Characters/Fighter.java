@@ -5,7 +5,7 @@ import lib.utils.Modes;
 public class Fighter extends Entity {
 
     public Fighter(String nom) {
-        super(nom, 16, 2, 10, 8);
+        super(nom, 2, 16, 10, 8);
     }
 
     public Fighter(String nom, int pointsAttaque, int pointsDefense, int pointsVie, int pointsDommages) {
@@ -40,7 +40,5 @@ public class Fighter extends Entity {
                 System.out.printf("%sL'attaque réussie!%s%n%n",
                         Terminal.BLUE, Terminal.CLEAR);
         }
-
-        mourrir(ennemi);
     }
 }

@@ -1,11 +1,12 @@
 package lib.Characters;
 import lib.utils.Terminal;
 import lib.utils.Modes;
+import java.util.Random;
 
 public class Cleric extends Entity {
 
     public Cleric(String nom) {
-        super(nom, 17, 4, 8, 6);
+        super(nom, 4, 17, 8, 6);
     }
 
     public Cleric(String nom, int pointsAttaque, int pointsDefense, int pointsVie, int pointsDommages) {
@@ -18,7 +19,7 @@ public class Cleric extends Entity {
     }
 
     @Override public void coupSpecial(Entity allie, Modes.descriptions mode) {
-        int vieRestauree = this.getDommage(2, 6);
+        int vieRestauree = new Random().nextInt(2, 6);
         allie.changerVie(-vieRestauree);
 
         switch (mode) {

@@ -1,9 +1,11 @@
 package lib.Characters;
 import lib.des.Des;
 import java.lang.Math;
+import java.util.ArrayList;
 import java.util.Random;
 import lib.utils.Terminal;
 import lib.utils.Modes;
+import java.util.Scanner;
 
 public abstract class Entity {
     public String nom;
@@ -11,6 +13,11 @@ public abstract class Entity {
     private int pointsDefense;
     private int pointsVie;
     private int dommage;
+    private boolean specialCharge = true;
+    private int manchesAvantSpecial = 0;
+    public static ArrayList<Entity> listeEntites = new ArrayList<>();
+    public static int nombreEntites = 0;
+
 
     public Entity(String nom, int pAttaque, int pDefense, int pVie, int Dommage) {
         this.nom = nom;
@@ -18,6 +25,51 @@ public abstract class Entity {
         this.pointsDefense = pDefense;
         this.pointsVie = pVie;
         this.dommage = Dommage;
+
+        listeEntites.add(this);
+        nombreEntites++;
+    }
+
+    public static void jouerManche()
+    {
+        for (int i = 0; !listeEntites.isEmpty() && i < listeEntites.size(); i++) {
+            listeEntites.get(i).jouerTour();
+            if (!listeEntites.get(i).estEnVie()){
+                listeEntites.remove(i);
+                i--;
+                nombreEntites--;
+            }
+        }
+    }
+
+    public void jouerTour() {
+        Scanner stdin = new Scanner(System.in);
+        stdin.useDelimiter("\n");
+        String entree;
+
+        String messageSpecial = this.specialCharge ?
+                    Terminal.GREEN + "Faire votre coup spécial,":
+                    Terminal.YELLOW + "Coup spécial indisponible,";
+        messageSpecial += Terminal.CLEAR;
+
+        if (this.estEnVie()) {
+            System.out.printf("%sC'est au tour de %s.%s%n" +
+                    "Que voulez-vous faire?%n" +
+                    "1 -\tFaire une attaque standard%n" +
+                    "2 -\t%s%n" +
+                    "3 -\tFuir%n.",
+                    Terminal.GREEN, this.nom, Terminal.CLEAR, messageSpecial);
+
+            entree = stdin.next();
+        }
+        else {
+            System.out.printf("%s est mort(e).%n",
+                    this.nom);
+        }
+    }
+
+    public static int getNombreEntites() {
+        return nombreEntites;
     }
 
     public int getPointsVie() {
@@ -54,14 +106,12 @@ public abstract class Entity {
         return valeurRetour;
     }
 
-    public int getDommage(int min, int max) {
-        return new Random().nextInt(min, max);
-    }
-
     public void attaquer(Entity ennemi) {
         attaquer(ennemi, Modes.descriptions.BASIC);
     }
     public void attaquer(Entity ennemi, Modes.descriptions mode) {
+//        Les statistiques des classes étaient complètements décâlissantes,
+//        donc j'ai flip l'attaque et la défense pour rendre ça plus difficile
         int difficultee = ennemi.getPointsDefense() - this.pointsAttaque;
         int deAttaque = Des.D20.lancerDe();
 
@@ -91,7 +141,6 @@ public abstract class Entity {
                             Terminal.BLUE, Terminal.CLEAR);
                     break;
             }
-            mourrir(ennemi);
         }
         else {
             switch (mode) {
@@ -118,10 +167,7 @@ public abstract class Entity {
     public abstract void coupSpecial(Entity ennemi);
     public abstract void coupSpecial(Entity ennemi, Modes.descriptions mode);
 
-    public static void mourrir(Entity entity) {
-        if (entity.getPointsVie() == 0) {
-            System.out.printf("%s%s est mourru. :`(%s,%n",
-                    Terminal.YELLOW, entity.nom, Terminal.CLEAR);
-        }
+    public boolean estEnVie() {
+        return this.pointsVie > 0;
     }
 }
