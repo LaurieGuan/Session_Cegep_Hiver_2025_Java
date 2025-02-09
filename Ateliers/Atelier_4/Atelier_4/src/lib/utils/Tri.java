@@ -2,7 +2,7 @@ package lib.utils;
 import lib.Characters.Entity;
 import java.util.ArrayList;
 
-public class TriFouille {
+public class Tri {
 
     public static class sss {
         public static void sort(ArrayList<Entity> entites) {
@@ -20,7 +20,7 @@ public class TriFouille {
         }
     }
 
-    public static class seperation {
+    public static class separation {
         public static void sort(ArrayList<Entity> entities) {
             ArrayList<Entity> ennemis = new ArrayList<>();
 
