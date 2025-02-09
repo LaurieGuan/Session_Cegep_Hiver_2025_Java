@@ -10,7 +10,7 @@ import lib.utils.Tri;
 import java.util.Scanner;
 
 public abstract class Entity {
-    public static ArrayList<Entity> listeEntites = new ArrayList<>();
+    private static ArrayList<Entity> listeEntites = new ArrayList<>();
     private static int nombreEntites;
     private static int nombreMonstres;
     private static int nombreJoueurs;
@@ -109,6 +109,10 @@ public abstract class Entity {
 
     public static int getNombreJoueurs() {
         return nombreJoueurs;
+    }
+
+    public static ArrayList<Entity> getListeEntites() {
+        return listeEntites;
     }
 
     public int getPointsVie() {
