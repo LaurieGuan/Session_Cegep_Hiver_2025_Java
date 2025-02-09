@@ -89,6 +89,16 @@ public abstract class Entity {
         }
     }
 
+    public void supprimerEntite() {
+        listeEntites.remove(this);
+        nombreEntites--;
+
+        switch (this.relation) {
+            case Modes.status.FRIENDLY -> nombreJoueurs--;
+            case Modes.status.ENNEMY -> nombreMonstres--;
+        }
+    }
+
     public static int getNombreEntites() {
         return nombreEntites;
     }
