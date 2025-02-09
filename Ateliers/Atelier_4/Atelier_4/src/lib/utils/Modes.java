@@ -6,8 +6,21 @@ public class Modes {
         BASIC,
         SILENT,
     }
+
     public enum getteurs {
         ATTRIBUT,
         ALEATOIRE,
+    }
+
+    public enum entites {
+        FIGHTER,
+        MAGE,
+        CLERIC,
+        MONSTER,
+    }
+
+    public enum status {
+        FRIENDLY,
+        ENNEMY,
     }
 }
