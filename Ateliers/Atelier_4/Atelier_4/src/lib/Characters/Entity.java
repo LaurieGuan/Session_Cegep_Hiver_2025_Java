@@ -5,22 +5,30 @@ import java.util.ArrayList;
 import java.util.Random;
 import lib.utils.Terminal;
 import lib.utils.Modes;
+import lib.utils.Tri;
+
 import java.util.Scanner;
 
 public abstract class Entity {
+    public static ArrayList<Entity> listeEntites = new ArrayList<>();
+    private static int nombreEntites;
+    private static int nombreMonstres;
+    private static int nombreJoueurs;
+
     public String nom;
+    public int initiative;
     private int pointsAttaque;
     private int pointsDefense;
     private int pointsVie;
     private int dommage;
     private boolean specialCharge = true;
     private int manchesAvantSpecial = 0;
-    public static ArrayList<Entity> listeEntites = new ArrayList<>();
-    public static int nombreEntites = 0;
+    private Modes.status relation;
 
 
-    public Entity(String nom, int pAttaque, int pDefense, int pVie, int Dommage) {
+    public Entity(String nom, Modes.status relation, int pAttaque, int pDefense, int pVie, int Dommage) {
         this.nom = nom;
+        this.relation = relation;
         this.pointsAttaque = pAttaque;
         this.pointsDefense = pDefense;
         this.pointsVie = pVie;
@@ -28,6 +36,17 @@ public abstract class Entity {
 
         listeEntites.add(this);
         nombreEntites++;
+        if (this.relation == Modes.status.ENNEMY) {
+            nombreMonstres++;
+        } else if (this.relation == Modes.status.FRIENDLY) {
+            nombreJoueurs++;
+        }
+    }
+
+    public static void lancerCombat() {
+        lancerInitiative();
+        Tri.sss.sort(listeEntites);
+        Tri.separation.sort(listeEntites);
     }
 
     public static void jouerManche()
@@ -43,24 +62,20 @@ public abstract class Entity {
     }
 
     public void jouerTour() {
-        Scanner stdin = new Scanner(System.in);
-        stdin.useDelimiter("\n");
+        Scanner stdin = new Scanner(System.in).useDelimiter("\n");
         String entree;
 
-        String messageSpecial = this.specialCharge ?
-                    Terminal.GREEN + "Faire votre coup spécial,":
-                    Terminal.YELLOW + "Coup spécial indisponible,";
-        messageSpecial += Terminal.CLEAR;
-
         if (this.estEnVie()) {
-            System.out.printf("%sC'est au tour de %s.%s%n" +
-                    "Que voulez-vous faire?%n" +
-                    "1 -\tFaire une attaque standard%n" +
-                    "2 -\t%s%n" +
-                    "3 -\tFuir%n.",
-                    Terminal.GREEN, this.nom, Terminal.CLEAR, messageSpecial);
+            do {
 
-            entree = stdin.next();
+                Terminal.menu.choisirAction(this);
+                entree = stdin.next();
+            } while (!entree.equals("1") && !entree.equals("2") && !entree.equals("3"));
+
+            switch (entree) {
+                case "1":
+
+            }
         }
         else {
             System.out.printf("%s est mort(e).%n",
@@ -68,8 +83,22 @@ public abstract class Entity {
         }
     }
 
+    public static void lancerInitiative() {
+        for (Entity entity : listeEntites) {
+            entity.initiative = Des.D20.lancerDe();
+        }
+    }
+
     public static int getNombreEntites() {
         return nombreEntites;
+    }
+
+    public static int getNombreMonstres() {
+        return nombreMonstres;
+    }
+
+    public static int getNombreJoueurs() {
+        return nombreJoueurs;
     }
 
     public int getPointsVie() {
@@ -119,48 +148,12 @@ public abstract class Entity {
             int dommagesEffectues = this.getDommage(Modes.getteurs.ALEATOIRE);
             ennemi.changerVie(-dommagesEffectues);
 
-            switch (mode) {
-                case Modes.descriptions.BASIC:
-                    System.out.printf("%sL'attaque réussie!%n" +
-                                    "%sVous avez effectué %d de dommages.%s%n%n",
-                            Terminal.BLUE,
-                            Terminal.RED, dommagesEffectues, Terminal.CLEAR);
-                    break;
-                case Modes.descriptions.VERBOSE:
-                    System.out.printf("Il faut un lancer de %d ou plus pour toucher %s.%n" +
-                                    "Le dé tombe... C'est un %s%d%s%n" +
-                                    "%sCela touche l'adversaire!%n" +
-                                    "%sVous effectuez %d de dommage à l'adversaire!%s%n%n",
-                            difficultee, ennemi.nom,
-                            Terminal.RED, deAttaque, Terminal.CLEAR,
-                            Terminal.BLUE,
-                            Terminal.RED, dommagesEffectues, Terminal.CLEAR);
-                    break;
-                case Modes.descriptions.SILENT:
-                    System.out.printf("%sL'attaque réussie!%s%n%n",
-                            Terminal.BLUE, Terminal.CLEAR);
-                    break;
-            }
+            Terminal.menu.attaqueBasique.reussie(this, ennemi, mode,
+                    deAttaque, dommagesEffectues, difficultee);
         }
         else {
-            switch (mode) {
-                case Modes.descriptions.BASIC:
-                    System.out.printf("%sL'attaque échoue!%n" +
-                            "Vous n'effectuez aucuns dommages.%s%n%n",
-                            Terminal.YELLOW, Terminal.CLEAR);
-                    break;
-                case Modes.descriptions.VERBOSE:
-                    System.out.printf("Il faut un dé d'au moins %d pour toucher %s.%n" +
-                            "Le dé tombe... C'est un %s%d%s%n" +
-                            "%sCela ne touche pas l'adversaire.%s%n%n",
-                            difficultee, ennemi.nom,
-                            Terminal.RED, deAttaque, Terminal.CLEAR,
-                            Terminal.YELLOW, Terminal.YELLOW);
-                    break;
-                case Modes.descriptions.SILENT:
-                    System.out.printf("%sL'attaque échoue!%s%n%n",
-                            Terminal.YELLOW, Terminal.CLEAR);
-            }
+            Terminal.menu.attaqueBasique.rate(ennemi, mode,
+                    deAttaque, difficultee);
         }
     }
 
@@ -169,5 +162,9 @@ public abstract class Entity {
 
     public boolean estEnVie() {
         return this.pointsVie > 0;
+    }
+
+    public Modes.status friendOrFoe() {
+        return this.relation;
     }
 }
