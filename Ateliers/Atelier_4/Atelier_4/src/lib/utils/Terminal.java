@@ -2,6 +2,8 @@ package lib.utils;
 
 import lib.Characters.Entity;
 
+import java.util.ArrayList;
+
 public class Terminal {
 
     public static class color {
@@ -27,6 +29,16 @@ public class Terminal {
                     Terminal.color.GREEN, joueur.nom, Terminal.color.CLEAR, messageSpecial);
 
         }
+
+        public static void choisirCible(ArrayList<Entity> ennemis) {
+            System.out.printf("Choisissez votre cible%n");
+
+            for (Entity cibles: ennemis) {
+                System.out.printf("");
+            }
+
+        }
+
         public static class attaqueBasique {
 
             public static void reussie(Entity joueur, Entity ennemi,
